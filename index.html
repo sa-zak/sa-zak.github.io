@@ -91,7 +91,7 @@ td:hover{
 </tr>
 </table>
 </div>
-<div id="nav" style="display: none;background-color:#2F3136;width:10%;position: absolute; z-index: 2;" >
+<div id="nav" style="display: none;background-color:#2F3136;width:15%;position: absolute; z-index: 2;  overflow: scroll;" >
 <br><br><br>
 <img src="ship/arbiter.png" style="width: 50px;">
 <img src="ship/arrow.png" style="width: 50px;">
@@ -266,6 +266,7 @@ var percent=0;
 var recentmodule;
 const history=[];
 let ver=0
+var ship;
 var stage = new Konva.Stage({
   container: 'c',
   width: window.innerWidth,
@@ -320,15 +321,15 @@ $("#nav img").click(function () {
         var w=this.width*125/202;
         var h=this.height*125/202;
 
-        var img = new Konva.Image({
+        ship = new Konva.Image({
 image: imageObj,
 width: w,
 height: h,
 
 });
-layer.add(img);
+layer.add(ship);
 stage.add(layer);
-img.moveToBottom();
+ship.moveToBottom();
       };
 });
 $(document).keydown(function(e){
@@ -491,7 +492,8 @@ save()
 
 })
 stage.on('click', (e) => {
-if (event.which==1 && e.target === stage && recentmodule){
+if (event.which==1 && recentmodule){
+  if(e.target === stage || e.target===ship)
   var img = new Konva.Image({
 image: recentmodule,
 draggable: true,
