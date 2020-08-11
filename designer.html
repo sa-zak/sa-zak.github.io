@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <head>
-<title>Zak SA Builder Beta</title>
+<title>Zak SA Designer</title>
 <link rel="icon" href="zak.png">
 <style>
   #header {
@@ -94,7 +94,6 @@ img{
 </tr>
 </table>
 </div>
-
 <br><br><br><div id="c" style="position: fixed" ondrop="json(event);" ondragover="dragOverHandler(event);"></div>
 <div class="tooltip" style="position: absolute;top: 6%;left:93%">EDIT TIPS<span class="tooltiptext">Hold Ctrl + Left Mouse Button to insert multiple<br>Drag to move<br>Double tap to remove<br>Drag and zoom background like map<br>Drop project file here to import<br>Hold right mouse button to draw cursor box select cells<br>Ctrl C to clone selected cells<br>Delete/Backspace to remove selected cells<br>Ctrl Z / Ctrl Shift Z to undo / redo<br>Use keys 1-9 and 0 and - to quick select cells</span></div>
 <div id="footer" style="background-color:#2F3136;">
@@ -150,6 +149,7 @@ $( document ).ready( function() {
   $( "#inventory img" ).click( function(event) {
     var imageObj = new Image();
       imageObj.src = $(this).attr("src");
+      imageObj.source=$(this).attr("src");
       imageObj.onload = function () {
         drawImage(imageObj);
     save()
@@ -174,6 +174,7 @@ $("#nav img").click(function () {
 
   var imageObj = new Image();
       imageObj.src = $(this).attr("src");
+      imageObj.source=$(this).attr("src");
 
       imageObj.onload = function () {
         var w=this.width*125/202;
@@ -216,10 +217,10 @@ imageNode.image(nativeImage);
 moduleimage(imageNode);
 imageNode.getLayer().batchDraw();}
 nativeImage.src = imageNode.getAttr('source');
+console.log(imageNode.getAttr('source'));
 window.layer=imageNode.getLayer();
 })
 stagesetup(stage);
-
 stage.batchDraw();
 }
 function getRelativePointerPosition(node) {
@@ -328,75 +329,50 @@ if (selectionRectangle.visible()) {
 $(document).keydown(function(e) {//49
 if (e.keyCode >=48 && e.keyCode <=57 || e.keyCode==189){
 var imageObj = new Image();
+imageObj.source=$(this).attr("src");
 
 switch(e.keyCode){
   case 49:
-  imageObj.src = $( "#inventory img" )[0].src;
-recentmodule=imageObj;
-$( "#inventory img" ).css('box-shadow','');
-$( "#inventory img" ).eq(0).css('box-shadow','5px 5px 5px LightBlue')
+  var x=0
   break;
   case 50:
-  imageObj.src = $( "#inventory img" )[1].src;
-recentmodule=imageObj;
-$( "#inventory img" ).css('box-shadow','');
-$( "#inventory img" ).eq(1).css('box-shadow','5px 5px 5px LightBlue')
+  var x=1
   break;
   case 51:
-  imageObj.src = $( "#inventory img" )[2].src;
-recentmodule=imageObj;
-$( "#inventory img" ).css('box-shadow','');
-$( "#inventory img" ).eq(2).css('box-shadow','5px 5px 5px LightBlue')
+  var x=2
   break;
   case 52:
-  imageObj.src = $( "#inventory img" )[3].src;
-recentmodule=imageObj;
-$( "#inventory img" ).css('box-shadow','');
-$( "#inventory img" ).eq(3).css('box-shadow','5px 5px 5px LightBlue')
+  var x=3
   break;
   case 53:
-  imageObj.src = $( "#inventory img" )[4].src;
-recentmodule=imageObj;
-$( "#inventory img" ).css('box-shadow','');
-$( "#inventory img" ).eq(4).css('box-shadow','5px 5px 5px LightBlue')
+  var x=4
   break;
   case 54:
-  imageObj.src = $( "#inventory img" )[5].src;
-recentmodule=imageObj;
-$( "#inventory img" ).css('box-shadow','');
-$( "#inventory img" ).eq(5).css('box-shadow','5px 5px 5px LightBlue')
+  var x=5
   break;
   case 55:
-  imageObj.src = $( "#inventory img" )[6].src;
-recentmodule=imageObj;
-$( "#inventory img" ).css('box-shadow','');
-$( "#inventory img" ).eq(6).css('box-shadow','5px 5px 5px LightBlue')
+  var x=6
   break;
   case 56:
-  imageObj.src = $( "#inventory img" )[7].src;
-recentmodule=imageObj;
-$( "#inventory img" ).css('box-shadow','');
-$( "#inventory img" ).eq(7).css('box-shadow','5px 5px 5px LightBlue')
+  var x=7
   break;
   case 57:
-  imageObj.src = $( "#inventory img" )[8].src;
-recentmodule=imageObj;
-$( "#inventory img" ).css('box-shadow','');
-$( "#inventory img" ).eq(8).css('box-shadow','5px 5px 5px LightBlue')
+  var x=8
   break;
   case 48:
-  imageObj.src = $( "#inventory img" )[9].src;
-recentmodule=imageObj;
-$( "#inventory img" ).css('box-shadow','');
-$( "#inventory img" ).eq(9).css('box-shadow','5px 5px 5px LightBlue')
+  var x=9
   break;
   case 189:
-  imageObj.src = $( "#inventory img" )[10].src;
-recentmodule=imageObj;
-$( "#inventory img" ).css('box-shadow','');
-$( "#inventory img" ).eq(10).css('box-shadow','5px 5px 5px LightBlue')
+  var x=10
   break;
 }
+
+imageObj.src = $( "#inventory img" )[x].src;
+imageObj.source = $( "#inventory img" )[x].src;
+
+recentmodule=imageObj;
+$( "#inventory img" ).css('box-shadow','');
+$( "#inventory img" ).eq(x).css('box-shadow','5px 5px 5px LightBlue')
 }
 if (e.keyCode == 67 && e.ctrlKey) {
 tr.nodes().forEach(function(entry) {
@@ -421,6 +397,7 @@ stage.on('mousemove', (e) => {
 if (event.which==1 && recentmodule && e.target && ctrl){
 var img = new Konva.Image({
 image: recentmodule,
+source: recentmodule.src,
 draggable: true,
 x: Math.round(getRelativePointerPosition(group).x / blockSize) * blockSize,
 y: Math.round(getRelativePointerPosition(group).y / blockSize) * blockSize,
@@ -434,6 +411,7 @@ stage.on('click', (e) => {
 if (event.which==1 && recentmodule && e.target){
 var img = new Konva.Image({
 image: recentmodule,
+source: recentmodule.src,
 draggable: true,
 x: Math.round(getRelativePointerPosition(group).x / blockSize) * blockSize,
 y: Math.round(getRelativePointerPosition(group).y / blockSize) * blockSize,
@@ -476,7 +454,7 @@ reader.readAsText(ev.dataTransfer.files[0]);
 }//json
 function dragOverHandler(ev){ev.preventDefault();}
 function downloadString() {
-  var text=stage.toJSON()+"#"+usage+"#"+energy+"#"+percent;
+  var text=stage.toJSON()+"#0#0#0";
   var fileType="text/txt";
   var fileName="build.project";
   var blob = new Blob([text], { type: fileType });
@@ -498,8 +476,6 @@ var img = new Konva.Image({
 image: imageObj,
 draggable: true,
 source: imageObj.src,
-rad:imageObj.rad,
-color:imageObj.color
 });
 moduleimage(img);
 layer.add(img);
