@@ -1,0 +1,504 @@
+<!doctype html>
+<html>
+<head>
+<title>Zak SA Builder Beta</title>
+<link rel="icon" href="zak.png">
+<style>
+  #header {
+  position: fixed;
+  width: 100%;
+  color:white;
+  z-index: 3;
+  }
+  #footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  color:white;
+  overflow-x: auto;
+  white-space: nowrap;
+  z-index: 2;
+  min-height: 5%;
+  }
+  #inventory{
+  width: 100%;
+  overflow-x: auto;
+  white-space: nowrap;
+
+  }
+  body{
+  color:white;
+  position:static !important;
+  margin: 0;
+  padding: 0;
+  overflow:hidden
+  }
+  button {
+  background-color: inherit;
+  border: none;
+  outline: none;
+  z-index: 2;
+  color:white;
+  }
+  td {
+  height: 40px;
+  width:25%;
+  text-align: center;
+
+}
+td:hover{
+  background-color:#202225;
+  cursor:pointer;
+}
+  button:hover {
+  background-color:#202225;
+  cursor:pointer;
+  }
+  .tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 300px;
+  background-color:#202225;
+  color:white;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  position: absolute;
+  z-index: 1;
+  top: 100%;
+  left: 50%;
+  margin-left: -270px;
+}
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
+img{
+  margin: 0px 5px;
+}
+
+</style>
+</style>
+</head>
+<body style="background-color:#36393F;">
+
+<div id="header" style="background-color:#2F3136;">
+<table style="width: 100%; height: 90%;" >
+<tr>
+<td   onclick="window.location='http://github.com/ZacharyLaw/Zak#zak-'">Space Arena Zak Designer</td>
+<td  onclick="downloadString()">DOWNLOAD PROJECT</td>
+<td><a id="download" href="#" style="color:white">DOWNLOAD IMAGE</a></td>
+</tr>
+</table>
+</div>
+
+<br><br><br><div id="c" style="position: fixed" ondrop="json(event);" ondragover="dragOverHandler(event);"></div>
+<div class="tooltip" style="position: absolute;top: 6%;left:93%">EDIT TIPS<span class="tooltiptext">Hold Ctrl + Left Mouse Button to insert multiple<br>Drag to move<br>Double tap to remove<br>Drag and zoom background like map<br>Drop project file here to import<br>Hold right mouse button to draw cursor box select module<br>Ctrl C to clone selected module<br>Delete/Backspace to remove selected module<br>Ctrl Z / Ctrl Shift Z to undo / redo (beta)</span></div>
+<div id="footer" style="background-color:#2F3136;">
+Click to insert
+<div id="inventory" style="position: absolute; bottom: 0%; text-align:center;position:relative;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<img src="cell0.png">
+<img src="cell1.png">
+<img src="cell2.png">
+<img src="cell3.png">
+<img src="cell4.png">
+<img src="cell5.png">
+<img src="cell6.png">
+<img src="cell7.png">
+<img src="cell8.png">
+<img src="cell9.png">
+<img src="cell10.png">
+</div>
+</div>
+<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script src="https://unpkg.com/konva@7.0.4/konva.min.js"></script>
+
+<script>
+var blockSize = 50;
+var energy=0;
+var percent=0;
+var recentmodule;
+const history=[];
+let ver=0
+var ship;
+var stage = new Konva.Stage({
+  container: 'c',
+  width: window.innerWidth,
+  height: window.innerHeight,
+});
+var tr = new Konva.Transformer({
+    enabledAnchors: [],
+    rotateEnabled: false,
+    borderStroke:'lightblue',
+    padding:10,
+  });
+var layer = new Konva.Layer();
+var group = new Konva.Group({});
+var ctrl
+layer.add(group);
+stage.draggable(true);
+stagesetup(stage)
+window.addEventListener('resize', fitStageIntoParentContainer);
+document.addEventListener('contextmenu', event => event.preventDefault());
+document.addEventListener('keydown', function (ctrl) {window.ctrl=ctrl.ctrlKey;});
+  document.addEventListener('keyup', function (ctrl) {window.ctrl=ctrl.ctrlKey});
+$( document ).ready( function() {
+  $( "#inventory img" ).click( function(event) {
+    var imageObj = new Image();
+      imageObj.src = $(this).attr("src");
+      imageObj.onload = function () {
+        drawImage(imageObj);
+    save()
+      };
+      $( "#inventory img" ).css('box-shadow','');
+      $(this).css('box-shadow','5px 5px 5px LightBlue');
+
+recentmodule=imageObj;
+
+});
+$('.category').click( function(event) {
+  if ($(this).attr('id')=="all"){$(".weap, .def, .util").show();
+  }else{$(".weap, .def, .util").hide();
+  $("."+$(this).attr('id')).show();}});
+
+$("#download").click(function () {
+  $("#download").attr("download","build.png").attr("href",trimCanvas().toDataURL("image/png").replace(/^data:image\/png/,"data:application/octet-stream"))
+});
+
+$("#nav img").click(function () {
+  $("#nav").toggle();
+
+  var imageObj = new Image();
+      imageObj.src = $(this).attr("src");
+
+      imageObj.onload = function () {
+        var w=this.width*125/202;
+        var h=this.height*125/202;
+
+        ship = new Konva.Image({
+image: imageObj,
+width: w,
+height: h,
+
+});
+layer.add(ship);
+stage.add(layer);
+ship.moveToBottom();
+      };
+});
+$(document).keydown(function(e){
+  if (e.which === 90 && e.ctrlKey && e.shiftKey){undo(1)
+  }else if (e.which === 90 && e.ctrlKey){undo()}})
+});//ready
+//function download(){$("#download").attr("download","build.png").attr("href",trimCanvas().toDataURL("image/png").replace(/^data:image\/png/,"data:application/octet-stream"))}
+function nav() {$("#nav").toggle()}
+function save(){
+  ver+=1;
+  history.splice(ver-1,history.length-ver,stage.toJSON()+"#0#0#0")
+}
+function undo(redo){
+if (!redo && ver!=1){ver-=1}
+else if (redo && ver!=history.length){ver+=1}
+version=history[ver-1];
+var string=version.split("#");
+stage.destroyChildren();
+layer.destroyChildren();
+$("canvas").remove();
+window.stage = Konva.Node.create(string[0], 'c');
+stage.find('Image').forEach(imageNode => {
+const nativeImage = new window.Image();
+nativeImage.onload = () => {
+imageNode.image(nativeImage);
+moduleimage(imageNode);
+imageNode.getLayer().batchDraw();}
+nativeImage.src = imageNode.getAttr('source');
+window.layer=imageNode.getLayer();
+})
+stagesetup(stage);
+
+stage.batchDraw();
+}
+function getRelativePointerPosition(node) {
+        var transform = node.getAbsoluteTransform().copy();
+        transform.invert();
+        var pos = stage.getPointerPosition();
+        return transform.point(pos);
+      }
+function stagesetup(stage){
+  var tr = new Konva.Transformer({
+    enabledAnchors: [],
+    rotateEnabled: false,
+    borderStroke:'lightblue',
+    padding:10,
+  });
+  var group = new Konva.Group({});
+layer.add(group);
+      layer.add(tr);
+      layer.draw();
+      var selectionRectangle = new Konva.Rect({
+        fill: 'lightblue',
+        opacity: 0.2,
+      });
+      layer.add(selectionRectangle);
+      var x1, y1, x2, y2;
+      $(document).keydown(function(e){
+      if (e.ctrlKey){stage.draggable(false)}});
+      $(document).keyup(function(e){stage.draggable(true)})
+
+      stage.on('mousedown touchstart', (e) => {
+        if (event.which!=3){
+          return;
+          }else if (e.target !== stage) {
+          return;
+        }
+        x1 = getRelativePointerPosition(group).x;
+        y1 = getRelativePointerPosition(group).y;
+        x2 = getRelativePointerPosition(group).x;
+        y2 = getRelativePointerPosition(group).y;
+        selectionRectangle.visible(true);
+        selectionRectangle.width(0);
+        selectionRectangle.height(0);
+        layer.draw();
+      });
+      stage.on('mousemove touchmove', () => {
+        if (event.which!=3){
+          return;
+          }else if (!selectionRectangle.visible()) {
+          return;
+        }
+        x2 = getRelativePointerPosition(group).x;
+        y2 = getRelativePointerPosition(group).y;
+        selectionRectangle.setAttrs({
+          x: Math.min(x1, x2),
+          y: Math.min(y1, y2),
+          width: Math.abs(x2 - x1),
+          height: Math.abs(y2 - y1),
+        });
+        layer.batchDraw();
+      });
+      stage.on('mouseup touchend', () => {
+        if (event.which!=3){
+          return;
+          }else if (!selectionRectangle.visible()) {
+          return;
+        }
+        setTimeout(() => {
+          selectionRectangle.visible(false);
+          layer.batchDraw();
+        });
+
+        var shapes = stage.find('Image').toArray();
+        var box = selectionRectangle.getClientRect();
+        var selected = shapes.filter((shape) =>
+          Konva.Util.haveIntersection(box, shape.getClientRect())
+        );
+        tr.nodes(selected);
+        layer.batchDraw();
+      });
+      stage.on('click tap', function (e) {
+if (selectionRectangle.visible()) {
+          return;
+        }
+        if (e.target === stage) {
+          tr.nodes([]);
+          layer.draw();
+          return;        }
+        if (!e.target.hasName('Image')) {
+          return;}
+        const metaPressed = e.evt.shiftKey || e.evt.ctrlKey || e.evt.metaKey;
+        const isSelected = tr.nodes().indexOf(e.target) >= 0;
+
+        if (!metaPressed && !isSelected) {
+          tr.nodes([e.target]);
+        } else if (metaPressed && isSelected) {
+          const nodes = tr.nodes().slice(); // use slice to have new copy of array
+          nodes.splice(nodes.indexOf(e.target), 1);
+          tr.nodes(nodes);
+        } else if (metaPressed && !isSelected) {
+          const nodes = tr.nodes().concat([e.target]);
+          tr.nodes(nodes);
+        }
+        layer.draw();
+      });
+
+$(document).keydown(function(e) {//8 46
+if (e.keyCode == 67 && e.ctrlKey) {
+tr.nodes().forEach(function(entry) {
+var clone=entry.clone()
+moduleimage(clone);
+layer.add(clone);
+});
+save()
+}else if  (e.keyCode == 8 || e.keyCode==46){
+  tr.nodes().forEach(function(entry) {
+    entry.destroy();
+    selectionRectangle.visible(false);
+
+    layer.batchDraw();
+  });
+
+}
+
+})
+
+stage.on('mousemove', (e) => {
+  console.log(ctrl.ctrlKey)
+if (event.which==1 && recentmodule && e.target && ctrl){
+var img = new Konva.Image({
+image: recentmodule,
+draggable: true,
+x: Math.round(getRelativePointerPosition(group).x / blockSize) * blockSize,
+y: Math.round(getRelativePointerPosition(group).y / blockSize) * blockSize,
+});
+moduleimage(img);
+layer.add(img);
+stage.add(layer);
+  save();
+};})
+
+stage.on('dragmove',()=>{  document.body.style.cursor='move'});
+stage.on('dragend',()=>{  document.body.style.cursor='default'});
+stage.on('wheel', (e) => {
+e.evt.preventDefault();
+var oldScale = stage.scaleX();
+var pointer = stage.getPointerPosition();
+var mousePointTo = {x: (pointer.x - stage.x()) / oldScale,y: (pointer.y - stage.y()) / oldScale,};
+var newScale =e.evt.deltaY > 0 ?  oldScale / 1.1: oldScale * 1.1;
+stage.scale({ x: newScale, y: newScale });
+var newPos = {x: pointer.x - mousePointTo.x * newScale,y: pointer.y - mousePointTo.y * newScale,};
+stage.position(newPos);
+stage.batchDraw();
+});}//stagesetup
+function json(ev) {
+ev.preventDefault();
+reader = new FileReader();
+reader.onload = function (event) {
+var string=event.target.result.split("#");
+stage = Konva.Node.create(string[0], 'c');
+stage.find('Image').forEach(imageNode => {
+const nativeImage = new window.Image();
+nativeImage.onload = () => {
+imageNode.image(nativeImage);
+stagesetup(stage);
+moduleimage(imageNode);
+imageNode.getLayer().batchDraw();}
+nativeImage.src = imageNode.getAttr('source');})
+stage.batchDraw();};
+reader.readAsText(ev.dataTransfer.files[0]);
+}//json
+function dragOverHandler(ev){ev.preventDefault();}
+function downloadString() {
+  var text=stage.toJSON()+"#"+usage+"#"+energy+"#"+percent;
+  var fileType="text/txt";
+  var fileName="build.project";
+  var blob = new Blob([text], { type: fileType });
+  var a = document.createElement('a');
+  a.download = fileName;
+  a.href = URL.createObjectURL(blob);
+  a.dataset.downloadurl = [fileType, a.download, a.href].join(':');
+  a.style.display = "none";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(function() { URL.revokeObjectURL(a.href); }, 1500);
+}
+function fitStageIntoParentContainer() {
+  stage.width(window.innerWidth)
+  stage.height(window.innerHeight)}
+function drawImage(imageObj) {
+var img = new Konva.Image({
+image: imageObj,
+draggable: true,
+source: imageObj.src,
+rad:imageObj.rad,
+color:imageObj.color
+});
+moduleimage(img);
+layer.add(img);
+stage.add(layer);
+
+}//drawimage
+function moduleimage(img){
+  if (!ctrl){
+  img.on('dragmove mouseover mouseout dblclick dbltap dragend ', (e) => {
+  layer=img.getLayer()
+
+switch(e.type) {
+
+  case 'dragend':
+  img.position({
+    x: Math.round(img.x() / blockSize) * blockSize,
+    y: Math.round(img.y() / blockSize) * blockSize});
+    layer.batchDraw();
+    save();
+    break;
+
+  case 'dblclick':
+  case 'dbltap':
+    img.destroy();
+    stage.draw();
+    document.body.style.cursor = 'default';
+    save()
+    break;
+}});}}
+function trimCanvas(c) {
+
+var c=$('canvas')[0]
+
+
+    var ctx = c.getContext('2d');
+    var copy =  document.createElement('canvas').getContext('2d');
+    var    pixels = ctx.getImageData(0, 0, c.width, c.height);
+        var    l = pixels.data.length;
+        var    i;
+        var    bound = {
+            top: null,
+            left: null,
+            right: null,
+            bottom: null
+        };
+        var    x, y;
+    for (i = 0; i < l; i += 4) {
+        if (pixels.data[i + 3] !== 0) {
+            x = (i / 4) % c.width;
+            y = ~~((i / 4) / c.width);
+
+            if (bound.top === null) {
+                bound.top = y;
+            }
+
+            if (bound.left === null) {
+                bound.left = x;
+            } else if (x < bound.left) {
+                bound.left = x;
+            }
+
+            if (bound.right === null) {
+                bound.right = x;
+            } else if (bound.right < x) {
+                bound.right = x;
+            }
+
+            if (bound.bottom === null) {
+                bound.bottom = y;
+            } else if (bound.bottom < y) {
+                bound.bottom = y;
+            }
+        }
+    }
+    var trimHeight = bound.bottom - bound.top,
+        trimWidth = bound.right - bound.left,
+        trimmed = ctx.getImageData(bound.left, bound.top, trimWidth, trimHeight);
+    copy.canvas.width = trimWidth+1*1;
+    copy.canvas.height = trimHeight+1*1;
+    copy.putImageData(trimmed, 0, 0);
+    return copy.canvas;
+
+}
+</script>
+</body>
+</html>
