@@ -96,7 +96,7 @@ img{
 </div>
 
 <br><br><br><div id="c" style="position: fixed" ondrop="json(event);" ondragover="dragOverHandler(event);"></div>
-<div class="tooltip" style="position: absolute;top: 6%;left:93%">EDIT TIPS<span class="tooltiptext">Hold Ctrl + Left Mouse Button to insert multiple<br>Drag to move<br>Double tap to remove<br>Drag and zoom background like map<br>Drop project file here to import<br>Hold right mouse button to draw cursor box select module<br>Ctrl C to clone selected module<br>Delete/Backspace to remove selected module<br>Ctrl Z / Ctrl Shift Z to undo / redo (beta)</span></div>
+<div class="tooltip" style="position: absolute;top: 6%;left:93%">EDIT TIPS<span class="tooltiptext">Hold Ctrl + Left Mouse Button to insert multiple<br>Drag to move<br>Double tap to remove<br>Drag and zoom background like map<br>Drop project file here to import<br>Hold right mouse button to draw cursor box select cells<br>Ctrl C to clone selected cells<br>Delete/Backspace to remove selected cells<br>Ctrl Z / Ctrl Shift Z to undo / redo</span></div>
 <div id="footer" style="background-color:#2F3136;">
 Click to insert
 <div id="inventory" style="position: absolute; bottom: 0%; text-align:center;position:relative;">
@@ -356,7 +356,20 @@ y: Math.round(getRelativePointerPosition(group).y / blockSize) * blockSize,
 moduleimage(img);
 layer.add(img);
 stage.add(layer);
-  save();
+save();
+};})
+stage.on('click', (e) => {
+if (event.which==1 && recentmodule && e.target){
+var img = new Konva.Image({
+image: recentmodule,
+draggable: true,
+x: Math.round(getRelativePointerPosition(group).x / blockSize) * blockSize,
+y: Math.round(getRelativePointerPosition(group).y / blockSize) * blockSize,
+});
+moduleimage(img);
+layer.add(img);
+stage.add(layer);
+save();
 };})
 
 stage.on('dragmove',()=>{  document.body.style.cursor='move'});
