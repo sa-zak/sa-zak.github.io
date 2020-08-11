@@ -249,7 +249,14 @@ layer.add(group);
       $(document).keydown(function(e){
       if (e.ctrlKey){stage.draggable(false)}});
       $(document).keyup(function(e){stage.draggable(true)})
-
+stage.on('dblclick', function (e) {
+const clickedOnEmptyArea = e.target === stage;
+if (clickedOnEmptyArea) {
+return;
+}
+e.target.destroy();
+layer.draw();
+});
       stage.on('mousedown touchstart', (e) => {
         if (event.which!=3){
           return;
@@ -407,8 +414,8 @@ layer.add(img);
 stage.add(layer);
 save();
 };})
-stage.on('click', (e) => {
-if (event.which==1 && recentmodule && e.target){
+stage.on('click tap', (e) => {
+if ((e.type=='tap' || event.which==1) && recentmodule && e.target){
 var img = new Konva.Image({
 image: recentmodule,
 source: recentmodule.src,
@@ -482,29 +489,23 @@ layer.add(img);
 stage.add(layer);
 
 }//drawimage
+
+
+
+
+
 function moduleimage(img){
-  if (!ctrl){
-  img.on('dragmove mouseover mouseout dblclick dbltap dragend ', (e) => {
-  layer=img.getLayer()
-
-switch(e.type) {
-
-  case 'dragend':
-  img.position({
-    x: Math.round(img.x() / blockSize) * blockSize,
-    y: Math.round(img.y() / blockSize) * blockSize});
-    layer.batchDraw();
-    save();
-    break;
-
-  case 'dblclick':
-  case 'dbltap':
-    img.destroy();
-    stage.draw();
-    document.body.style.cursor = 'default';
-    save()
-    break;
-}});}}
+if (!ctrl){
+img.on('   dragend ', (e) => {
+layer=img.getLayer()
+img.position({
+x: Math.round(img.x()/blockSize)*blockSize,
+y: Math.round(img.y()/blockSize)*blockSize});
+layer.batchDraw();
+save();
+});
+}
+}
 function trimCanvas(c) {
 
 var c=$('canvas')[0]
