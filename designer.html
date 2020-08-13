@@ -95,22 +95,34 @@ img{
 </table>
 </div>
 <br><br><br><div id="c" style="position: fixed" ondrop="json(event);" ondragover="dragOverHandler(event);"></div>
-<div class="tooltip" style="position: absolute;top: 6%;left:93%">EDIT TIPS<span class="tooltiptext">Hold Ctrl + Left Mouse Button to insert multiple<br>Drag to move<br>Double tap to remove<br>Drag and zoom background like map<br>Drop project file here to import<br>Hold right mouse button to draw cursor box select cells<br>Ctrl C to clone selected cells<br>Delete/Backspace to remove selected cells<br>Ctrl Z / Ctrl Shift Z to undo / redo<br>Use keys 1-9 and 0 and - to quick select cells</span></div>
+<div class="tooltip" style="position: absolute;top: 6%;left:93%">EDIT TIPS<span class="tooltiptext">Hold Ctrl + Left Mouse Button to insert multiple
+  <br>Drag to move
+  <br>Double tap to remove
+  <br>Drag and zoom background like map
+  <br>Drop project file here to import
+  <br>Hold right mouse button to draw cursor box select cells
+  <br>Ctrl C to clone selected cells
+  <br>Delete/Backspace to remove selected cells
+  <br>Ctrl Z / Ctrl Shift Z to undo / redo
+  <br>Use keys 1-9 and 0 and - to quick select cells
+<br>1-5 to edit selected cells number of upgrade</span></div>
 <div id="footer" style="background-color:#2F3136;">
 Click to insert
 <div id="inventory" style="position: absolute; bottom: 0%; text-align:center;position:relative;">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <img src="cell0.png">
-<img src="cell1.png">
+<img src="cell1.png" upg='u'>
 <img src="cell2.png">
-<img src="cell3.png">
+<img src="cell3.png" upg='u'>
 <img src="cell4.png">
-<img src="cell5.png">
+<img src="cell5.png" upg='u'>
 <img src="cell6.png">
 <img src="cell7.png">
-<img src="cell8.png">
-<img src="cell9.png">
-<img src="cell10.png">
+<img src="cell8.png" upg='u'>
+<img src="cell9.png" upg='u'>
+<img src="cell10.png" upg='u'>
+<img src="cell11.png">
+
 </div>
 </div>
 <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
@@ -122,6 +134,7 @@ var energy=0;
 var percent=0;
 var recentmodule;
 const history=[];
+var select=false;
 let ver=0
 var ship;
 var stage = new Konva.Stage({
@@ -150,10 +163,7 @@ $( document ).ready( function() {
     var imageObj = new Image();
       imageObj.src = $(this).attr("src");
       imageObj.source=$(this).attr("src");
-      imageObj.onload = function () {
-        drawImage(imageObj);
-    save()
-      };
+      imageObj.upg=$(this).attr("upg");
       $( "#inventory img" ).css('box-shadow','');
       $(this).css('box-shadow','5px 5px 5px LightBlue');
 
@@ -251,12 +261,65 @@ layer.add(group);
       $(document).keyup(function(e){stage.draggable(true)})
 stage.on('dblclick', function (e) {
 const clickedOnEmptyArea = e.target === stage;
-if (clickedOnEmptyArea) {
-return;
-}
-e.target.destroy();
-layer.draw();
+if (!clickedOnEmptyArea) {
+  e.target.destroy();
+layer.draw();}
 });
+
+$(document).keypress(function(e){
+  if (e.keyCode >=49 && e.keyCode <=53 && select){
+    tr.nodes().forEach(function(img){
+      if (e.keyCode==49){
+  context='I'
+  }else if (e.keyCode==50){
+    context='II'
+  }else if (e.keyCode==51){
+    context='III'
+  }else if (e.keyCode==52){
+    context='IV'
+  }else if (e.keyCode==53){
+    context='V'
+  }
+
+      if(img.attrs.upg){
+        var upg=new Konva.Group({
+          x:img.x(),
+          y:img.y(),
+          width: 50,
+        height: 50,
+        draggable:true
+        });
+        var imageObj = new Image();
+        imageObj.src = img.attrs.source;
+        imageObj.onload = function () {
+upg.add(new Konva.Image({
+image: imageObj,
+source: img.attrs.source,
+x:0,
+y:0,
+}));
+upg.add(new Konva.Text({
+x:0,
+y:3,
+width:50,
+height:50,
+fontSize: 50,
+fill: 'black',
+fontFamily: 'Calibri',
+text:context,
+align:'center',
+}));
+img.destroy();
+moduleimage(upg);
+layer.add(upg);
+stage.add(upg.getLayer());
+upg.getLayer().batchDraw();}
+
+      }
+    })
+  }
+})
+
       stage.on('mousedown touchstart', (e) => {
         if (event.which!=3){
           return;
@@ -305,6 +368,7 @@ layer.draw();
           Konva.Util.haveIntersection(box, shape.getClientRect())
         );
         tr.nodes(selected);
+        select=true;
         layer.batchDraw();
       });
       stage.on('click tap', function (e) {
@@ -312,6 +376,7 @@ if (selectionRectangle.visible()) {
           return;
         }
         if (e.target === stage) {
+          select=false;
           tr.nodes([]);
           layer.draw();
           return;        }
@@ -334,10 +399,8 @@ if (selectionRectangle.visible()) {
       });
 
 $(document).keydown(function(e) {//49
-if (e.keyCode >=48 && e.keyCode <=57 || e.keyCode==189){
+if (!select && e.keyCode >=48 && e.keyCode <=57 || e.keyCode==189  ){
 var imageObj = new Image();
-imageObj.source=$(this).attr("src");
-
 switch(e.keyCode){
   case 49:
   var x=0
@@ -376,11 +439,14 @@ switch(e.keyCode){
 
 imageObj.src = $( "#inventory img" )[x].src;
 imageObj.source = $( "#inventory img" )[x].src;
-
+imageObj.upg=$( "#inventory img" ).eq(x).attr("upg");
 recentmodule=imageObj;
 $( "#inventory img" ).css('box-shadow','');
 $( "#inventory img" ).eq(x).css('box-shadow','5px 5px 5px LightBlue')
 }
+
+
+
 if (e.keyCode == 67 && e.ctrlKey) {
 tr.nodes().forEach(function(entry) {
 var clone=entry.clone()
@@ -406,6 +472,7 @@ var img = new Konva.Image({
 image: recentmodule,
 source: recentmodule.src,
 draggable: true,
+upg:recentmodule.upg,
 x: Math.round(getRelativePointerPosition(group).x / blockSize) * blockSize,
 y: Math.round(getRelativePointerPosition(group).y / blockSize) * blockSize,
 });
@@ -420,6 +487,7 @@ var img = new Konva.Image({
 image: recentmodule,
 source: recentmodule.src,
 draggable: true,
+upg:recentmodule.upg,
 x: Math.round(getRelativePointerPosition(group).x / blockSize) * blockSize,
 y: Math.round(getRelativePointerPosition(group).y / blockSize) * blockSize,
 });
@@ -483,20 +551,16 @@ var img = new Konva.Image({
 image: imageObj,
 draggable: true,
 source: imageObj.src,
+upg:imageObj.upg
 });
 moduleimage(img);
 layer.add(img);
 stage.add(layer);
 
 }//drawimage
-
-
-
-
-
 function moduleimage(img){
 if (!ctrl){
-img.on('   dragend ', (e) => {
+img.on('dragend ', (e) => {
 layer=img.getLayer()
 img.position({
 x: Math.round(img.x()/blockSize)*blockSize,
