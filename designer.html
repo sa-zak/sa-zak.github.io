@@ -90,7 +90,8 @@ img{
 <tr>
 <td   onclick="window.location='http://github.com/ZacharyLaw/Zak#zak-'">Space Arena Zak Designer</td>
 <td  onclick="downloadString()">DOWNLOAD PROJECT</td>
-<td><a id="download" href="#" style="color:white">DOWNLOAD IMAGE</a></td>
+<td id="download" href="#" style="color:white">DOWNLOAD IMAGE</td>
+
 </tr>
 </table>
 </div>
@@ -110,18 +111,18 @@ img{
 Click to insert
 <div id="inventory" style="position: absolute; bottom: 0%; text-align:center;position:relative;">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<img src="cell0.png">
-<img src="cell1.png" upg='u'>
-<img src="cell2.png">
-<img src="cell3.png" upg='u'>
-<img src="cell4.png">
-<img src="cell5.png" upg='u'>
-<img src="cell6.png">
-<img src="cell7.png">
-<img src="cell8.png" upg='u'>
-<img src="cell9.png" upg='u'>
-<img src="cell10.png" upg='u'>
-<img src="cell11.png">
+<img src="cell0.png" title="Hotkey 1">
+<img src="cell1.png" title="Hotkey 2"upg='u'>
+<img src="cell2.png" title="Hotkey 3">
+<img src="cell3.png" title="Hotkey 4" upg='u'>
+<img src="cell4.png" title="Hotkey 5">
+<img src="cell5.png" title="Hotkey 6" upg='u'>
+<img src="cell6.png" title="Hotkey 7">
+<img src="cell7.png" title="Hotkey 8">
+<img src="cell8.png" title="Hotkey 9" upg='u'>
+<img src="cell9.png" title="Hotkey 0" upg='u'>
+<img src="cell10.png" title="Hotkey -" upg='u'>
+<img src="cell11.png" title="Hotkey =">
 
 </div>
 </div>
@@ -178,7 +179,6 @@ $('.category').click( function(event) {
 $("#download").click(function () {
   stage.scale({ x: 1, y: 1 });
   stage.batchDraw();
-
   $("#download").attr("download","build.png").attr("href",trimCanvas().toDataURL("image/png").replace(/^data:image\/png/,"data:application/octet-stream"))
 });
 
@@ -227,10 +227,8 @@ stage.find('Image').forEach(imageNode => {
 const nativeImage = new window.Image();
 nativeImage.onload = () => {
 imageNode.image(nativeImage);
-moduleimage(imageNode);
 imageNode.getLayer().batchDraw();}
 nativeImage.src = imageNode.getAttr('source');
-console.log(imageNode.getAttr('source'));
 window.layer=imageNode.getLayer();
 })
 stagesetup(stage);
@@ -262,6 +260,9 @@ layer.add(group);
       $(document).keydown(function(e){
       if (e.ctrlKey){stage.draggable(false)}});
       $(document).keyup(function(e){stage.draggable(true)})
+
+
+      
 stage.on('dblclick', function (e) {
 const clickedOnEmptyArea = e.target === stage;
 if (!clickedOnEmptyArea) {
@@ -313,7 +314,6 @@ text:context,
 align:'center',
 }));
 img.destroy();
-moduleimage(upg);
 layer.add(upg);
 stage.add(upg.getLayer());
 upg.getLayer().batchDraw();}
@@ -402,7 +402,7 @@ if (selectionRectangle.visible()) {
       });
 
 $(document).keydown(function(e) {//49
-if (!select && e.keyCode >=48 && e.keyCode <=57 || e.keyCode==189  ){
+if (!select && e.keyCode >=48 && e.keyCode <=57 || e.keyCode==189 || e.keyCode==187 ){
 var imageObj = new Image();
 switch(e.keyCode){
   case 49:
@@ -438,6 +438,9 @@ switch(e.keyCode){
   case 189:
   var x=10
   break;
+  case 187:
+  var x=11
+  break;
 }
 
 imageObj.src = $( "#inventory img" )[x].src;
@@ -453,7 +456,6 @@ $( "#inventory img" ).eq(x).css('box-shadow','5px 5px 5px LightBlue')
 if (e.keyCode == 67 && e.ctrlKey) {
 tr.nodes().forEach(function(entry) {
 var clone=entry.clone()
-moduleimage(clone);
 layer.add(clone);
 });
 save()
@@ -468,9 +470,23 @@ save()
 }
 
 })
+layer.on('dragend', function (e) {
+        var target = e.target;
+        var targetRect = e.target.getClientRect();
+        layer.children.each(function (group) {
+        target.position({
+x: Math.round(target.x()/blockSize)*blockSize,
+y: Math.round(target.y()/blockSize)*blockSize});
+layer.batchDraw();
+save();  
 
-stage.on('mousemove', (e) => {
-if (event.which==1 && recentmodule && e.target && ctrl){
+      })})
+
+
+
+          stage.on('mousemove', (e) => {
+
+if (event.which==1 && recentmodule && e.target === stage && ctrl){
 var img = new Konva.Image({
 image: recentmodule,
 source: recentmodule.src,
@@ -479,13 +495,12 @@ upg:recentmodule.upg,
 x: Math.round(getRelativePointerPosition(group).x / blockSize) * blockSize,
 y: Math.round(getRelativePointerPosition(group).y / blockSize) * blockSize,
 });
-moduleimage(img);
 layer.add(img);
 stage.add(layer);
 save();
 };})
 stage.on('click tap', (e) => {
-if ((e.type=='tap' || event.which==1) && recentmodule && e.target){
+if ((e.type=='tap' || event.which==1) && e.target === stage){
 var img = new Konva.Image({
 image: recentmodule,
 source: recentmodule.src,
@@ -494,7 +509,6 @@ upg:recentmodule.upg,
 x: Math.round(getRelativePointerPosition(group).x / blockSize) * blockSize,
 y: Math.round(getRelativePointerPosition(group).y / blockSize) * blockSize,
 });
-moduleimage(img);
 layer.add(img);
 stage.add(layer);
 save();
@@ -524,7 +538,6 @@ const nativeImage = new window.Image();
 nativeImage.onload = () => {
 imageNode.image(nativeImage);
 stagesetup(stage);
-moduleimage(imageNode);
 imageNode.getLayer().batchDraw();}
 nativeImage.src = imageNode.getAttr('source');})
 stage.batchDraw();};
@@ -556,23 +569,11 @@ draggable: true,
 source: imageObj.src,
 upg:imageObj.upg
 });
-moduleimage(img);
 layer.add(img);
 stage.add(layer);
 
 }//drawimage
-function moduleimage(img){
-if (!ctrl){
-img.on('dragend ', (e) => {
-layer=img.getLayer()
-img.position({
-x: Math.round(img.x()/blockSize)*blockSize,
-y: Math.round(img.y()/blockSize)*blockSize});
-layer.batchDraw();
-save();
-});
-}
-}
+
 function trimCanvas(c) {
 
 var c=$('canvas')[0]
