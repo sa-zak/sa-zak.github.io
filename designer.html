@@ -152,6 +152,7 @@ var tr = new Konva.Transformer({
 var layer = new Konva.Layer();
 var group = new Konva.Group({});
 var ctrl = false;
+var keys = {};
 layer.add(group);
 stage.draggable(true);
 stagesetup(stage)
@@ -159,7 +160,22 @@ window.addEventListener('resize', fitStageIntoParentContainer);
 document.addEventListener('contextmenu', event => event.preventDefault());
 document.addEventListener('keydown', function (ctrl) {window.ctrl=ctrl.ctrlKey;});
   document.addEventListener('keyup', function (ctrl) {window.ctrl=ctrl.ctrlKey});
+  document.addEventListener('keydown', function (key) {window.key=key});
+
+
+
+
+
 $( document ).ready( function() {
+  $(document).keydown(function (e) {
+    keys[e.which] = true;
+    movestage();
+});
+
+$(document).keyup(function (e) {
+    delete keys[e.which];
+    movestage();
+});
   $( "#inventory img" ).click( function(event) {
     var imageObj = new Image();
       imageObj.src = $(this).attr("src");
@@ -209,7 +225,28 @@ $(document).keydown(function(e){
   }else if (e.which === 90 && e.ctrlKey){undo()}})
 });//ready
 //function download(){$("#download").attr("download","build.png").attr("href",trimCanvas().toDataURL("image/png").replace(/^data:image\/png/,"data:application/octet-stream"))}
-function nav() {$("#nav").toggle()}
+function movestage(){
+  document.addEventListener('keydown', function (e) {
+    var html = '';
+    for (var i in keys) {
+        if (!keys.hasOwnProperty(i)) continue;
+        html+=i+' ';
+    }
+    if (html.includes("39") || html.includes("68")){//right
+    stage.x(stage.x() - 0.1)
+    }
+    if (html.includes("40") || html.includes("83")){//down
+    stage.y(stage.y() - 0.1)
+    }
+    if (html.includes("37") || html.includes("65")){//left
+    stage.x(stage.x() + 0.1)
+    }
+    if (html.includes("38") || html.includes("87")){//up
+    stage.y(stage.y() + 0.1)
+    }
+        layer.batchDraw();
+      });
+}
 function save(){
   ver+=1;
   history.splice(ver-1,history.length-ver,stage.toJSON()+"#0#0#0")
@@ -260,7 +297,6 @@ layer.add(group);
       $(document).keydown(function(e){
       if (e.ctrlKey){stage.draggable(false)}});
       $(document).keyup(function(e){stage.draggable(true)})
-
 
       
 stage.on('dblclick', function (e) {
