@@ -246,6 +246,8 @@ $( document ).ready( function() {
     }else{$(".weap, .def, .util").hide();
     $("."+$(this).attr('id')).show();}});
   $("#download").click(function () {
+    mirror.remove();
+    layer.draw();
     var image = trimCanvas().toDataURL("image/png").replace(/^data:image\/png/,"data:application/octet-stream");
     var anchor = document.createElement('a');
     anchor.setAttribute('download', 'design.png');
