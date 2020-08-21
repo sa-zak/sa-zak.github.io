@@ -246,24 +246,45 @@ $( document ).ready( function() {
     }else{$(".weap, .def, .util").hide();
     $("."+$(this).attr('id')).show();}});
   $("#download").click(function () {
-    console.log(stage.toDataURL());
 
+    var oldscale=stage.scale();
+    var oldx=stage.x();
+    var oldy=stage.y();
 
+    var leftest=stage.find('Image')[0].x();
+    var rightest=stage.find('Image')[0].x()+50;
+    var uppest=stage.find('Image')[0].y();
+    var lowest=stage.find('Image')[0].y()+50;
 
-    /*
+      stage.find('Image').forEach(img=>{
+        rightest=Math.max(rightest,img.x()+50);
+        leftest=Math.min(leftest,img.x());
+        uppest=Math.min(rightest,img.x()+50);
+        lowest=Math.max(leftest,img.x());
+      })
+
     if (mirror){mirror.opacity(0)}
-    oldscale=stage.scale();
     stage.scale({x:1,y:1});
-    layer.draw();
+    stage.x(leftest);
+    stage.y(uppest);
+    stage.width(Math.abs(leftest)+Math.abs(rightest))
+    stage.height(Math.abs(uppest)+Math.abs(lowest))
+    stage.draw();
+
     var image = trimCanvas().toDataURL("image/png").replace(/^data:image\/png/,"data:application/octet-stream");
     var anchor = document.createElement('a');
     anchor.setAttribute('download', 'design.png');
     anchor.setAttribute('href', image);
     anchor.click();
-    if (mirror){mirror.opacity(0.5)}
+    
+
     stage.scale(oldscale);
-    layer.batchDraw();
-    */
+    stage.x(oldx);
+    stage.y(oldy);
+    stage.width(window.innerWidth);
+  stage.height(window.innerHeight);
+      layer.batchDraw();
+    
 
   });
   $(document).keydown(function(e){
