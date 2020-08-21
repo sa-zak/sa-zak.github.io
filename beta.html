@@ -247,6 +247,8 @@ $( document ).ready( function() {
     $("."+$(this).attr('id')).show();}});
   $("#download").click(function () {
     mirror.opacity(0);
+    oldscale=stage.scale();
+    stage.scale(1);
     layer.draw();
     var image = trimCanvas().toDataURL("image/png").replace(/^data:image\/png/,"data:application/octet-stream");
     var anchor = document.createElement('a');
@@ -254,6 +256,8 @@ $( document ).ready( function() {
     anchor.setAttribute('href', image);
     anchor.click();
     mirror.opacity(1);
+    stage.scale(oldscale);
+    layer.batchDraw();
 
   });
   $(document).keydown(function(e){
