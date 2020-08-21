@@ -248,7 +248,7 @@ $( document ).ready( function() {
   $("#download").click(function () {
     if (mirror){mirror.opacity(0)}
     oldscale=stage.scale();
-    stage.scale(1);
+    stage.scale({x:1,y:1});
     layer.draw();
     var image = trimCanvas().toDataURL("image/png").replace(/^data:image\/png/,"data:application/octet-stream");
     var anchor = document.createElement('a');
