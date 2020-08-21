@@ -222,9 +222,12 @@ $('.category').click( function(event) {
 $("#download").click(function () {
   stage.scale({ x: 1, y: 1 });
   stage.batchDraw();
-console.log(trimCanvas().toDataURL("image/png").replace(/^data:image\/png/,"data:application/octet-stream"));
-
-  $("#download").attr("download","build.png").attr("href",trimCanvas().toDataURL("image/png").replace(/^data:image\/png/,"data:application/octet-stream"))
+  console.log('beta');
+  var image = trimCanvas().toDataURL("image/png").replace(/^data:image\/png/,"data:application/octet-stream");
+    var anchor = document.createElement('a');
+    anchor.setAttribute('download', 'design.png');
+    anchor.setAttribute('href', image);
+    anchor.click();
 });
 
 $(document).keydown(function(e){
