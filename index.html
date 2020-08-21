@@ -308,8 +308,12 @@ $('.category').click( function(event) {
   $("."+$(this).attr('id')).show();}});
 
 $("#download").click(function () {
-  $("#download").attr("download","build.png").attr("href",trimCanvas().toDataURL("image/png").replace(/^data:image\/png/,"data:application/octet-stream"))
-});
+  var image = trimCanvas().toDataURL("image/png").replace(/^data:image\/png/,"data:application/octet-stream");
+    var anchor = document.createElement('a');
+    anchor.setAttribute('download', 'build.png');
+    anchor.setAttribute('href', image);
+    anchor.click();
+    });
 
 $("#nav img").click(function () {
   $("#nav").toggle();
