@@ -222,7 +222,11 @@ $('.category').click( function(event) {
 $("#download").click(function () {
   stage.scale({ x: 1, y: 1 });
   stage.batchDraw();
-  $("#download").attr("download","build.png").attr("href",trimCanvas().toDataURL("image/png").replace(/^data:image\/png/,"data:application/octet-stream"))
+  var image = trimCanvas().toDataURL("image/png").replace(/^data:image\/png/,"data:application/octet-stream");
+    var anchor = document.createElement('a');
+    anchor.setAttribute('download', 'design.png');
+    anchor.setAttribute('href', image);
+    anchor.click();
 });
 
 $(document).keydown(function(e){
@@ -276,6 +280,7 @@ var group = new Konva.Group({});
     group.add(clone);
     layer.add(group);
     layer.batchDraw();
+    save()
     img.on('dragmove', (e) => {
     clone.x(-img.x()+mirrorx*2-50)
     clone.y(img.y())
@@ -287,20 +292,21 @@ var group = new Konva.Group({});
     img.on('dragend', (e) => {
     clone.x(Math.round((-img.x()+mirrorx*2-50)/blockSize)*blockSize)
     clone.y(Math.round(img.y()/blockSize)*blockSize)
-
+    save()
     })
-
     clone.on('dragend', (e) => {
       img.x(Math.round((-clone.x()+mirrorx*2-50)/blockSize)*blockSize)
       img.y(Math.round(clone.y()/blockSize)*blockSize)
+      save()
     })
-
     img.on('dblclick', (e)=> {
       clone.destroy();
-      layer.draw()})
+      layer.draw();
+      save()})
       clone.on('dblclick', (e)=> {
       img.destroy();
-      layer.draw()})
+      layer.draw();
+      save()})
 }
 
 function undo(redo){
@@ -671,7 +677,7 @@ var c=$('canvas')[0]
 
     var ctx = c.getContext('2d');
     var copy =  document.createElement('canvas').getContext('2d');
-    var    pixels = ctx.getImageData(0, 0, c.width, c.height);
+    var pixels = ctx.getImageData(0, 0, c.width, c.height);
         var    l = pixels.data.length;
         var    i;
         var    bound = {
