@@ -246,7 +246,7 @@ $( document ).ready( function() {
     }else{$(".weap, .def, .util").hide();
     $("."+$(this).attr('id')).show();}});
   $("#download").click(function () {
-    mirror.opacity(0);
+    if (mirror){mirror.opacity(0)}
     oldscale=stage.scale();
     stage.scale(1);
     layer.draw();
@@ -255,7 +255,7 @@ $( document ).ready( function() {
     anchor.setAttribute('download', 'design.png');
     anchor.setAttribute('href', image);
     anchor.click();
-    mirror.opacity(1);
+    if (mirror){mirror.opacity(0.5)}
     stage.scale(oldscale);
     layer.batchDraw();
 
