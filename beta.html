@@ -220,9 +220,10 @@ $('.category').click( function(event) {
   $("."+$(this).attr('id')).show();}});
 
 $("#download").click(function () {
-  console.log("img");
   stage.scale({ x: 1, y: 1 });
   stage.batchDraw();
+console.log(trimCanvas().toDataURL("image/png").replace(/^data:image\/png/,"data:application/octet-stream"));
+
   $("#download").attr("download","build.png").attr("href",trimCanvas().toDataURL("image/png").replace(/^data:image\/png/,"data:application/octet-stream"))
 });
 
@@ -674,7 +675,7 @@ var c=$('canvas')[0]
 
     var ctx = c.getContext('2d');
     var copy =  document.createElement('canvas').getContext('2d');
-    var    pixels = ctx.getImageData(0, 0, c.width, c.height);
+    var pixels = ctx.getImageData(0, 0, c.width, c.height);
         var    l = pixels.data.length;
         var    i;
         var    bound = {
