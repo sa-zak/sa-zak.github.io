@@ -88,10 +88,10 @@ img{
 <div id="header" style="background-color:#2F3136;">
 <table style="width: 100%; height: 90%;" >
 <tr>
-<td   onclick="window.location='http://github.com/ZacharyLaw/Zak#zak-'">Space Arena Zak Designer</td>
+<td   onclick="window.location='https://github.com/sa-zak/sa-zak.github.io'">Space Arena Zak Designer</td>
+<td id="mirror">MIRROR MODE</td>
 <td  onclick="downloadString()">DOWNLOAD PROJECT</td>
 <td id="download" href="#" style="color:white">DOWNLOAD IMAGE</td>
-
 </tr>
 </table>
 </div>
@@ -105,7 +105,8 @@ img{
   <br>Ctrl C to clone selected cells
   <br>Delete/Backspace to remove selected cells
   <br>Ctrl Z / Ctrl Shift Z to undo / redo
-  <br>Use keys 1-9 and 0 and - to quick select cells
+  <br>Use keys 1-9,0,-,= to quick select cells
+  <br>WASD/← → ↑ ↓ to move builder
 <br>1-5 to edit selected cells number of upgrade</span></div>
 <div id="footer" style="background-color:#2F3136;">
 Click to insert
@@ -136,8 +137,10 @@ var percent=0;
 var recentmodule;
 const history=[];
 var select=false;
-let ver=0
+let ver=0;
 var ship;
+var mirror;
+var mirrorx;
 var stage = new Konva.Stage({
   container: 'c',
   width: window.innerWidth,
@@ -162,10 +165,6 @@ document.addEventListener('keydown', function (ctrl) {window.ctrl=ctrl.ctrlKey;}
   document.addEventListener('keyup', function (ctrl) {window.ctrl=ctrl.ctrlKey});
   document.addEventListener('keydown', function (key) {window.key=key});
 
-
-
-
-
 $( document ).ready( function() {
   $(document).keydown(function (e) {
     keys[e.which] = true;
@@ -187,6 +186,34 @@ $(document).keyup(function (e) {
 recentmodule=imageObj;
 
 });
+$("#mirror").click(function(event){
+if (!mirror){
+  if (!stage.find('Image')[0]){
+    mirrorx=Math.round(window.innerWidth/2/blockSize)*blockSize;
+  }else{
+    var rightest=stage.find('Image')[0].x();
+    stage.find('Image').forEach(img => {
+    rightest=Math.max(rightest,img.x());
+    })
+    mirrorx=rightest+50;
+  }
+  stage.find('Image').forEach(img => {
+
+    mirrorm(img)
+
+  })
+  window.mirror = new Konva.Line({
+    points: [mirrorx,getRelativePointerPosition(group).y-1000/stage.scale().x,mirrorx,getRelativePointerPosition(group).y+1000/stage.scale().x],
+    stroke: 'silver',
+    strokeWidth: 5,
+    opacity:0.5
+  });
+  layer.add(mirror);
+  mirror.moveToBottom();
+  stage.add(layer)
+  stage.batchDraw();
+  mirrorf();
+}})
 $('.category').click( function(event) {
   if ($(this).attr('id')=="all"){$(".weap, .def, .util").show();
   }else{$(".weap, .def, .util").hide();
@@ -198,33 +225,10 @@ $("#download").click(function () {
   $("#download").attr("download","build.png").attr("href",trimCanvas().toDataURL("image/png").replace(/^data:image\/png/,"data:application/octet-stream"))
 });
 
-$("#nav img").click(function () {
-  $("#nav").toggle();
-
-  var imageObj = new Image();
-      imageObj.src = $(this).attr("src");
-      imageObj.source=$(this).attr("src");
-
-      imageObj.onload = function () {
-        var w=this.width*125/202;
-        var h=this.height*125/202;
-
-        ship = new Konva.Image({
-image: imageObj,
-width: w,
-height: h,
-
-});
-layer.add(ship);
-stage.add(layer);
-ship.moveToBottom();
-      };
-});
 $(document).keydown(function(e){
   if (e.which === 90 && e.ctrlKey && e.shiftKey){undo(1)
   }else if (e.which === 90 && e.ctrlKey){undo()}})
 });//ready
-//function download(){$("#download").attr("download","build.png").attr("href",trimCanvas().toDataURL("image/png").replace(/^data:image\/png/,"data:application/octet-stream"))}
 function movestage(){
   document.addEventListener('keydown', function (e) {
     var html = '';
@@ -249,8 +253,56 @@ function movestage(){
 }
 function save(){
   ver+=1;
-  history.splice(ver-1,history.length-ver,stage.toJSON()+"#0#0#0")
+  history.splice(ver-1,history.length-ver,stage.toJSON()+"#0#0#0");
+  
 }
+function mirrorf(){
+
+stage.on('dragmove', (e) => {
+mirror.points( [mirrorx,getRelativePointerPosition(group).y-1000/stage.scale().x,mirrorx,getRelativePointerPosition(group).y+1000/stage.scale().x])
+layer.draw()})
+stage.on('wheel', (e) => {
+mirror.points( [mirrorx,getRelativePointerPosition(group).y-1000/stage.scale().x,mirrorx,getRelativePointerPosition(group).y+1000/stage.scale().x])
+layer.draw()})
+
+
+}
+function mirrorm(img){
+var group = new Konva.Group({});
+    var clone = img.clone({
+    x: -img.x()+mirrorx*2-50,
+    });
+    group.add(img);
+    group.add(clone);
+    layer.add(group);
+    layer.batchDraw();
+    img.on('dragmove', (e) => {
+    clone.x(-img.x()+mirrorx*2-50)
+    clone.y(img.y())
+    })
+    clone.on('dragmove', (e) => {
+    img.x(-clone.x()+mirrorx*2-50)
+    img.y(clone.y())
+    })
+    img.on('dragend', (e) => {
+    clone.x(Math.round((-img.x()+mirrorx*2-50)/blockSize)*blockSize)
+    clone.y(Math.round(img.y()/blockSize)*blockSize)
+
+    })
+
+    clone.on('dragend', (e) => {
+      img.x(Math.round((-clone.x()+mirrorx*2-50)/blockSize)*blockSize)
+      img.y(Math.round(clone.y()/blockSize)*blockSize)
+    })
+
+    img.on('dblclick', (e)=> {
+      clone.destroy();
+      layer.draw()})
+      clone.on('dblclick', (e)=> {
+      img.destroy();
+      layer.draw()})
+}
+
 function undo(redo){
 if (!redo && ver!=1){ver-=1}
 else if (redo && ver!=history.length){ver+=1}
@@ -502,13 +554,13 @@ save()
 
     layer.batchDraw();
   });
+  save()
 
 }
 
 })
 layer.on('dragend', function (e) {
         var target = e.target;
-        var targetRect = e.target.getClientRect();
         layer.children.each(function (group) {
         target.position({
 x: Math.round(target.x()/blockSize)*blockSize,
@@ -533,6 +585,7 @@ y: Math.round(getRelativePointerPosition(group).y / blockSize) * blockSize,
 });
 layer.add(img);
 stage.add(layer);
+if (mirror){mirrorm(img)}
 save();
 };})
 stage.on('click tap', (e) => {
@@ -547,6 +600,7 @@ y: Math.round(getRelativePointerPosition(group).y / blockSize) * blockSize,
 });
 layer.add(img);
 stage.add(layer);
+if (mirror){mirrorm(img)}
 save();
 };})
 
