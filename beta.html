@@ -246,6 +246,11 @@ $( document ).ready( function() {
     }else{$(".weap, .def, .util").hide();
     $("."+$(this).attr('id')).show();}});
   $("#download").click(function () {
+    console.log(stage.toDataURL());
+
+
+
+    /*
     if (mirror){mirror.opacity(0)}
     oldscale=stage.scale();
     stage.scale({x:1,y:1});
@@ -258,6 +263,7 @@ $( document ).ready( function() {
     if (mirror){mirror.opacity(0.5)}
     stage.scale(oldscale);
     layer.batchDraw();
+    */
 
   });
   $(document).keydown(function(e){
