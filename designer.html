@@ -124,7 +124,7 @@ Click to insert
 <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
 <script src="https://unpkg.com/konva@7.0.4/konva.min.js"></script>
 <script>
-var blockSize = 50;
+var unit = 50;
 var energy=0;
 var percent=0;
 var recentmodule;
@@ -181,7 +181,7 @@ $( document ).ready( function() {
     $("#mirror").html('MIRROR MODE<br>Odd')
     window.mirror.destroy();
     if (!stage.find('Image')[0]){
-      mirrorx=Math.round(window.innerWidth/2/blockSize)*blockSize+75;
+      mirrorx=Math.round(window.innerWidth/2/unit)*unit+75;
     }else{
       var rightest=stage.find('Image')[0].x();
       stage.find('Image').forEach(img=>{
@@ -192,7 +192,7 @@ $( document ).ready( function() {
     window.mirrorparity=25;
     stage.find('Image').forEach(img=>{mirrorm(img)})
     window.mirror = new Konva.Line({
-      points: [mirrorx,getRelativePointerPosition(group).y-1000/stage.scale().x,mirrorx,getRelativePointerPosition(group).y+1000/stage.scale().x],
+      points: [mirrorx,relPos().y-1000/stage.scale().x,mirrorx,relPos().y+1000/stage.scale().x],
       stroke: 'silver',
       strokeWidth: 5,
       opacity:0.5
@@ -203,16 +203,16 @@ $( document ).ready( function() {
     stage.batchDraw();
     stage.on('dragmove', (e) => {
       if(mirror){
-    mirror.points( [mirrorx,getRelativePointerPosition(group).y-1000/stage.scale().x,mirrorx,getRelativePointerPosition(group).y+1000/stage.scale().x])
+    mirror.points( [mirrorx,relPos().y-1000/stage.scale().x,mirrorx,relPos().y+1000/stage.scale().x])
     layer.draw()}})
     stage.on('wheel', (e) => {
       if(mirror){
-    mirror.points( [mirrorx,getRelativePointerPosition(group).y-1000/stage.scale().x,mirrorx,getRelativePointerPosition(group).y+1000/stage.scale().x])
+    mirror.points( [mirrorx,relPos().y-1000/stage.scale().x,mirrorx,relPos().y+1000/stage.scale().x])
     layer.draw()}})
   }else if (mirrorparity==0){
     $("#mirror").html('MIRROR MODE<br>Even')
     if (!stage.find('Image')[0]){
-    mirrorx=Math.round(window.innerWidth/2/blockSize)*blockSize;
+    mirrorx=Math.round(window.innerWidth/2/unit)*unit;
     }else{
     var rightest=stage.find('Image')[0].x();
     stage.find('Image').forEach(img=>{rightest=Math.max(rightest,img.x())})
@@ -220,7 +220,7 @@ $( document ).ready( function() {
     window.mirrorparity=50;
     stage.find('Image').forEach(img=>{mirrorm(img)})
     window.mirror = new Konva.Line({
-      points: [mirrorx,getRelativePointerPosition(group).y-1000/stage.scale().x,mirrorx,getRelativePointerPosition(group).y+1000/stage.scale().x],
+      points: [mirrorx,relPos().y-1000/stage.scale().x,mirrorx,relPos().y+1000/stage.scale().x],
       stroke: 'silver',
       strokeWidth: 5,
       opacity:0.5
@@ -231,11 +231,11 @@ $( document ).ready( function() {
     stage.batchDraw();
     stage.on('dragmove', (e) => {
     if(mirror){
-    mirror.points( [mirrorx,getRelativePointerPosition(group).y-1000/stage.scale().x,mirrorx,getRelativePointerPosition(group).y+1000/stage.scale().x])
+    mirror.points( [mirrorx,relPos().y-1000/stage.scale().x,mirrorx,relPos().y+1000/stage.scale().x])
     layer.draw()}})
     stage.on('wheel', (e) => {
       if(mirror){
-    mirror.points( [mirrorx,getRelativePointerPosition(group).y-1000/stage.scale().x,mirrorx,getRelativePointerPosition(group).y+1000/stage.scale().x])
+    mirror.points( [mirrorx,relPos().y-1000/stage.scale().x,mirrorx,relPos().y+1000/stage.scale().x])
     layer.draw()}})
   }else if (mirrorparity==25){
     $("#mirror").html('MIRROR MODE')
@@ -329,14 +329,14 @@ function mirrorm(img){
   })
   img.on('dragend', (e) => {
     if(!mirror===true){return}
-    clone.x(Math.round((-img.x()+mirrorx*2-50)/blockSize)*blockSize)
-    clone.y(Math.round(img.y()/blockSize)*blockSize)
+    clone.x(Math.round((-img.x()+mirrorx*2-50)/unit)*unit)
+    clone.y(Math.round(img.y()/unit)*unit)
     save()
   })
   clone.on('dragend', (e) => {
     if(!mirror===true){return}
-    img.x(Math.round((-clone.x()+mirrorx*2-50)/blockSize)*blockSize)
-    img.y(Math.round(clone.y()/blockSize)*blockSize)
+    img.x(Math.round((-clone.x()+mirrorx*2-50)/unit)*unit)
+    img.y(Math.round(clone.y()/unit)*unit)
     save()
   })
   img.on('dblclick', (e)=> {
@@ -370,7 +370,8 @@ function undo(redo){
   stagesetup(stage);
   stage.batchDraw();
 }
-function getRelativePointerPosition(node) {
+function relPos() {
+  var node=group
   var transform = node.getAbsoluteTransform().copy();
   transform.invert();
   var pos = stage.getPointerPosition();
@@ -455,10 +456,10 @@ tr.nodes().forEach(function(img){
   stage.on('mousedown touchstart', (e) => {
   if ((e.target !== stage)||(event.which!=3)) {
   return;}
-  x1 = getRelativePointerPosition(group).x;
-  y1 = getRelativePointerPosition(group).y;
-  x2 = getRelativePointerPosition(group).x;
-  y2 = getRelativePointerPosition(group).y;
+  x1 = relPos().x;
+  y1 = relPos().y;
+  x2 = relPos().x;
+  y2 = relPos().y;
   selectionRectangle.visible(true);
   selectionRectangle.width(0);
   selectionRectangle.height(0);
@@ -467,8 +468,8 @@ tr.nodes().forEach(function(img){
 stage.on('mousemove touchmove', () => {
 if (!selectionRectangle.visible()||event.which!=3) {
 return;}
-x2 = getRelativePointerPosition(group).x;
-y2 = getRelativePointerPosition(group).y;
+x2 = relPos().x;
+y2 = relPos().y;
 selectionRectangle.setAttrs({
 x: Math.min(x1, x2),
 y: Math.min(y1, y2),
@@ -509,7 +510,7 @@ stage.on('click tap', function (e) {
   if (!metaPressed && !isSelected) {
   tr.nodes([e.target]);
   } else if (metaPressed && isSelected) {
-  const nodes = tr.nodes().slice(); // use slice to have new copy of array
+  const nodes = tr.nodes().slice();
   nodes.splice(nodes.indexOf(e.target), 1);
   tr.nodes(nodes);
   } else if (metaPressed && !isSelected) {
@@ -585,33 +586,29 @@ layer.on('dragend', function (e) {
   var target = e.target;
   layer.children.each(function (group) {
     target.position({
-      x: Math.round(target.x()/blockSize)*blockSize,
-      y: Math.round(target.y()/blockSize)*blockSize});
+      x: Math.round(target.x()/unit)*unit,
+      y: Math.round(target.y()/unit)*unit});
     layer.batchDraw();
     save();  
 })})
 stage.on('mousemove', (e) => {
 if (event.which==1 && recentmodule && ctrl){
+  var intercept=stage.getIntersection({x:Math.round(relPos().x/unit)*unit,y:Math.round(relPos().y/unit)*unit})
+  if(!intercept||intercept.attrs.source!=recentmodule.src||intercept.x()==mirrorx-25){
+    if(intercept||(intercept&&intercept.x()!=mirrorx-25)){ intercept.destroy()}
   var img = new Konva.Image({
     image: recentmodule,
     source: recentmodule.src,
     draggable: true,
     upg:recentmodule.upg,
-    x: Math.round(getRelativePointerPosition(group).x / blockSize) * blockSize,
-    y: Math.round(getRelativePointerPosition(group).y / blockSize) * blockSize,
+    x: Math.round(relPos().x / unit) * unit,
+    y: Math.round(relPos().y / unit) * unit,
   });
   layer.add(img);
   stage.add(layer);
   if (mirror){mirrorm(img)}
   save()
-};})
-//stage.on('mousedown', (e) => {
-//if (e.target!=stage){stage.find('Image').forEach(img2 => {
-//  if (mirror){
-//    if (e.target!=img2&&e.target.x()==img2.x()&&e.target.y()==img2.y()&&e.target.x()!=mirrorx-25){img2.destroy()}
-//  }else if (e.target!=img2&&e.target.x()==img2.x()&&e.target.y()==img2.y()){img2.destroy()}})}
-//})
-
+}}})
 stage.on('click tap', (e) => {
 if (e.type=='tap' || event.which==1 ){
 var img = new Konva.Image({
@@ -619,8 +616,8 @@ var img = new Konva.Image({
   source: recentmodule.src,
   draggable: true,
   upg:recentmodule.upg,
-  x: Math.round(getRelativePointerPosition(group).x / blockSize) * blockSize,
-  y: Math.round(getRelativePointerPosition(group).y / blockSize) * blockSize,
+  x: Math.round(relPos().x / unit) * unit,
+  y: Math.round(relPos().y / unit) * unit,
 });
 layer.add(img);
 stage.add(layer);
