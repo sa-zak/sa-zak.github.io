@@ -605,12 +605,12 @@ if (event.which==1 && recentmodule && ctrl){
   if (mirror){mirrorm(img)}
   save()
 };})
-stage.on('mousedown', (e) => {
-if (e.target!=stage){stage.find('Image').forEach(img2 => {
-  if (mirror){
-    if (e.target!=img2&&e.target.x()==img2.x()&&e.target.y()==img2.y()&&e.target.x()!=mirrorx-25){img2.destroy()}
-  }else if (e.target!=img2&&e.target.x()==img2.x()&&e.target.y()==img2.y()){img2.destroy()}})}
-})
+//stage.on('mousedown', (e) => {
+//if (e.target!=stage){stage.find('Image').forEach(img2 => {
+//  if (mirror){
+//    if (e.target!=img2&&e.target.x()==img2.x()&&e.target.y()==img2.y()&&e.target.x()!=mirrorx-25){img2.destroy()}
+//  }else if (e.target!=img2&&e.target.x()==img2.x()&&e.target.y()==img2.y()){img2.destroy()}})}
+//})
 
 stage.on('click tap', (e) => {
 if (e.type=='tap' || event.which==1 ){
