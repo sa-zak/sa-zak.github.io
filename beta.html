@@ -202,11 +202,13 @@ $( document ).ready( function() {
     stage.add(layer)
     stage.batchDraw();
     stage.on('dragmove', (e) => {
+      if(mirror){
     mirror.points( [mirrorx,getRelativePointerPosition(group).y-1000/stage.scale().x,mirrorx,getRelativePointerPosition(group).y+1000/stage.scale().x])
-    layer.draw()})
+    layer.draw()}})
     stage.on('wheel', (e) => {
+      if(mirror){
     mirror.points( [mirrorx,getRelativePointerPosition(group).y-1000/stage.scale().x,mirrorx,getRelativePointerPosition(group).y+1000/stage.scale().x])
-    layer.draw()})
+    layer.draw()}})
   }else if (mirrorparity==0){
     $("#mirror").html('MIRROR MODE<br>Even')
     if (!stage.find('Image')[0]){
@@ -228,11 +230,13 @@ $( document ).ready( function() {
     stage.add(layer)
     stage.batchDraw();
     stage.on('dragmove', (e) => {
+    if(mirror){
     mirror.points( [mirrorx,getRelativePointerPosition(group).y-1000/stage.scale().x,mirrorx,getRelativePointerPosition(group).y+1000/stage.scale().x])
-    layer.draw()})
+    layer.draw()}})
     stage.on('wheel', (e) => {
+      if(mirror){
     mirror.points( [mirrorx,getRelativePointerPosition(group).y-1000/stage.scale().x,mirrorx,getRelativePointerPosition(group).y+1000/stage.scale().x])
-    layer.draw()})
+    layer.draw()}})
   }else if (mirrorparity==25){
     $("#mirror").html('MIRROR MODE')
     window.mirrorparity=0;
@@ -246,23 +250,19 @@ $( document ).ready( function() {
     }else{$(".weap, .def, .util").hide();
     $("."+$(this).attr('id')).show();}});
   $("#download").click(function () {
-
     var oldscale=stage.scale();
     var oldx=stage.x();
     var oldy=stage.y();
-
     var leftest=stage.find('Image')[0].x();
     var rightest=stage.find('Image')[0].x()+50;
     var uppest=stage.find('Image')[0].y();
     var lowest=stage.find('Image')[0].y()+50;
-
-      stage.find('Image').forEach(img=>{
-        rightest=Math.max(rightest,img.x()+50);
-        leftest=Math.min(leftest,img.x());
-        uppest=Math.min(rightest,img.x()+50);
-        lowest=Math.max(leftest,img.x());
-      })
-
+    stage.find('Image').forEach(img=>{
+      rightest=Math.max(rightest,img.x()+50);
+      leftest=Math.min(leftest,img.x());
+      uppest=Math.min(rightest,img.x()+50);
+      lowest=Math.max(leftest,img.x());
+    })
     if (mirror){mirror.opacity(0)}
     stage.scale({x:1,y:1});
     stage.x(leftest);
@@ -270,22 +270,17 @@ $( document ).ready( function() {
     stage.width(Math.abs(leftest)+Math.abs(rightest))
     stage.height(Math.abs(uppest)+Math.abs(lowest))
     stage.draw();
-
     var image = trimCanvas().toDataURL("image/png").replace(/^data:image\/png/,"data:application/octet-stream");
     var anchor = document.createElement('a');
     anchor.setAttribute('download', 'design.png');
     anchor.setAttribute('href', image);
     anchor.click();
-    
-
     stage.scale(oldscale);
     stage.x(oldx);
     stage.y(oldy);
     stage.width(window.innerWidth);
-  stage.height(window.innerHeight);
-      layer.batchDraw();
-    
-
+    tage.height(window.innerHeight);
+    layer.batchDraw();
   });
   $(document).keydown(function(e){
     if (e.which === 90 && e.ctrlKey && e.shiftKey){undo(1)
@@ -596,7 +591,7 @@ layer.on('dragend', function (e) {
     save();  
 })})
 stage.on('mousemove', (e) => {
-if (event.which==1 && recentmodule && e.target === stage && ctrl){
+if (event.which==1 && recentmodule && ctrl){
   var img = new Konva.Image({
     image: recentmodule,
     source: recentmodule.src,
@@ -610,8 +605,15 @@ if (event.which==1 && recentmodule && e.target === stage && ctrl){
   if (mirror){mirrorm(img)}
   save()
 };})
+//stage.on('mousedown', (e) => {
+//if (e.target!=stage){stage.find('Image').forEach(img2 => {
+//  if (mirror){
+//    if (e.target!=img2&&e.target.x()==img2.x()&&e.target.y()==img2.y()&&e.target.x()!=mirrorx-25){img2.destroy()}
+//  }else if (e.target!=img2&&e.target.x()==img2.x()&&e.target.y()==img2.y()){img2.destroy()}})}
+//})
+
 stage.on('click tap', (e) => {
-if (((e.type=='tap' || event.which==1) && e.target === stage)){
+if (e.type=='tap' || event.which==1 ){
 var img = new Konva.Image({
   image: recentmodule,
   source: recentmodule.src,
