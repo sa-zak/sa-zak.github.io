@@ -3,78 +3,31 @@
 <body>
 <!--<img id="v" src="http://sa-zak.github.io/zak.png">-->
 <canvas id="canvas"></canvas>
-
 <script>
-canvas.width = innerWidth-20;
 ctx = canvas.getContext("2d");
 var ctxImage;
 var i=-1;
 var count=0
 const img = new Image;
 img.src = 'zak.png';
-//img.setAttribute('crossOrigin', '');
-
 img.onload = function(){
-    var c = document.createElement("canvas");
+    var ctxImage = document.createElement("canvas").getContext("2d");
     canvas.width = 1000;
     canvas.height = 1000;
-    ctxImage = c.getContext("2d");
-    ctx.imageSmoothingEnabled = false;
     var v=1
-    var size = Number(v) * 0.01;
-    var w = img.width * size;
-    var h = img.height * size;
+    var w = img.width * Number(v) * 0.01;
+    var h = img.height * Number(v) * 0.01;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctxImage.clearRect(0, 0, ctxImage.canvas.width, ctxImage.canvas.height);
     ctxImage.drawImage(img, 0, 0, w, h);
-    ctx.drawImage(ctxImage.canvas, 0, 0, w, h, 0, 0, canvas.width, canvas.height);
     var data = ctxImage.getImageData(0, 0, w, h);
     console.log(data)
     while ( (i += 4) <  data.data.length ) {
         console.log(data.data[i+3]!=0)
         var y = parseInt(i / w, 10);
         var x = i - y * w;
-
     }
 };
-//var rgb = getAverageRGB(document.getElementById('i'));
-//document.body.style.backgroundColor = 'rgb('+rgb.r+','+rgb.g+','+rgb.b+')';
-
-
-function getAverageRGB(imgEl) {
-    var blockSize = 5, // only visit every 5 pixels
-        defaultRGB = {r:0,g:0,b:0}, // for non-supporting envs
-        canvas = document.createElement('canvas'),
-        context = canvas.getContext && canvas.getContext('2d'),
-        data, width, height,
-        i = -4,
-        length,
-        rgb = {r:0,g:0,b:0},
-        count = 0;
-    if (!context) {
-        return defaultRGB;
-    }
-    height = canvas.height = imgEl.naturalHeight || imgEl.offsetHeight || imgEl.height;
-    width = canvas.width = imgEl.naturalWidth || imgEl.offsetWidth || imgEl.width;
-    context.drawImage(imgEl, 0, 0);
-    try {
-        data = context.getImageData(0, 0, width, height);
-    } catch(e) {
-        /* security error, img on diff domain */alert('x');
-        return defaultRGB;
-    }
-    length = data.data.length;
-    while ( (i += blockSize * 4) < length ) {
-        ++count;
-        rgb.r += data.data[i];
-        rgb.g += data.data[i+1];
-        rgb.b += data.data[i+2];
-    }
-    rgb.r = ~~(rgb.r/count);
-    rgb.g = ~~(rgb.g/count);
-    rgb.b = ~~(rgb.b/count);
-    return rgb;
-}
 </script>
 </body>
 </html>
