@@ -150,6 +150,13 @@ var group = new Konva.Group({});
 var ctrl = false;
 var keys = {};
 var mirrorparity=0;
+var mouseDown = 0;
+document.body.onmousedown = function() { 
+  ++mouseDown;
+}
+document.body.onmouseup = function() {
+  --mouseDown;
+}
 layer.add(group);
 stage.draggable(true);
 stagesetup(stage)
@@ -288,19 +295,20 @@ $( document ).ready( function() {
 });//ready
 function movestage(){
   document.addEventListener('keydown', function (e) {
-    var html = '';
-    for (var i in keys) {
-      if (!keys.hasOwnProperty(i)) continue;
-      html+=i+' '}
-    if (html.includes("39") || html.includes("68")){//right
-    stage.x(stage.x() - 0.1)}
-    if (html.includes("40") || html.includes("83")){//down
-    stage.y(stage.y() - 0.1)}
-    if (html.includes("37") || html.includes("65")){//left
-    stage.x(stage.x() + 0.1)}
-    if (html.includes("38") || html.includes("87")){//up
-    stage.y(stage.y() + 0.1)}
-    layer.batchDraw();
+    if (e.keyCode==39||e.keyCode==68||e.keyCode==40||e.keyCode==83||e.keyCode==37||e.keyCode==65||e.keyCode==38||e.keyCode==87){
+      var html = '';
+      for (var i in keys) {
+        if (!keys.hasOwnProperty(i)) continue;
+        html+=i+' '}
+      if (html.includes("39") || html.includes("68")){//right
+      stage.x(stage.x() - 0.1)}
+      if (html.includes("40") || html.includes("83")){//down
+      stage.y(stage.y() - 0.1)}
+      if (html.includes("37") || html.includes("65")){//left
+      stage.x(stage.x() + 0.1)}
+      if (html.includes("38") || html.includes("87")){//up
+      stage.y(stage.y() + 0.1)}
+      layer.batchDraw();}
   });
 }
 function save(){
@@ -601,16 +609,16 @@ if (event.which==1 && recentmodule && ctrl){
     source: recentmodule.src,
     draggable: true,
     upg:recentmodule.upg,
-    x: Math.round(relPos().x / unit) * unit,
-    y: Math.round(relPos().y / unit) * unit,
+    x: Math.round(relPos().x/unit)*unit,
+    y: Math.round(relPos().y/unit)*unit,
   });
   layer.add(img);
   stage.add(layer);
   if (mirror){mirrorm(img)}
   save()
 }}})
-stage.on('click tap', (e) => {
-if (e.type=='tap' || event.which==1 ){
+stage.on('click tap',(e)=>{
+if (e.type=='tap'||event.which==1){
 var img = new Konva.Image({
   image: recentmodule,
   source: recentmodule.src,
@@ -639,7 +647,41 @@ stage.on('wheel', (e) => {
 })}//stagesetup
 function json(ev) {
   ev.preventDefault();
-  reader = new FileReader();
+  var filetype=ev.dataTransfer.files[0].name.split('.').pop()
+  if (filetype=='png'){
+    var reader = new FileReader();
+  reader.onload = function (event) {
+    const img = new Image;
+    img.src = reader.result;
+    img.onload = function(){
+    var ctxImage=document.createElement("canvas").getContext("2d");
+    var v=5;
+    var w=img.width * Number(v) * 0.01;
+    var h=img.height * Number(v) * 0.01;
+    ctxImage.clearRect(0, 0, ctxImage.canvas.width, ctxImage.canvas.height);
+    ctxImage.drawImage(img, 0, 0, w, h);
+    var data=ctxImage.getImageData(0, 0, w, h).data;
+    var temp=new Image();
+      temp.src=$("#inventory img")[0].src;
+      var image = new Konva.Image({
+      image: temp,
+      source: $("#inventory img")[0].src,
+      draggable: true,
+      });
+    for (var i = 0; i < w * h; i++) {
+      if (data[i*4+3]!=0){
+      var y=parseInt(i / w, 10);
+      clone=image.clone();
+      clone.x(Math.round(i-y*w*50 / unit) * unit);
+      clone.y(Math.round(y*50 / unit) * unit);
+      layer.add(clone);
+      }
+    }
+    stage.add(layer);
+    }}
+    reader.readAsDataURL(ev.dataTransfer.files[0]);
+  }else if(filetype=='project'){
+    reader = new FileReader();
   reader.onload = function (event) {
   var string=event.target.result.split("#");
   stage = Konva.Node.create(string[0], 'c');
@@ -652,6 +694,7 @@ function json(ev) {
   nativeImage.src = imageNode.getAttr('source');})
   stage.batchDraw();};
   reader.readAsText(ev.dataTransfer.files[0]);
+  }
 }//json
 function dragOverHandler(ev){ev.preventDefault();}
 function downloadString() {
