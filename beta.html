@@ -30,8 +30,11 @@ img.onload = function(){
     ctx.drawImage(ctxImage.canvas, 0, 0, w, h, 0, 0, canvas.width, canvas.height);
     var data = ctxImage.getImageData(0, 0, w, h);
     console.log(data)
-    while ( (i += 1) <  data.data.length ) {
-        console.log(data.data[i+3])
+    while ( (i += 4) <  data.data.length ) {
+        console.log(data.data[i+3]!=0)
+        var y = parseInt(i / w, 10);
+        var x = i - y * w;
+
     }
 };
 //var rgb = getAverageRGB(document.getElementById('i'));
