@@ -28,10 +28,10 @@ img.onload = function(){
     ctxImage.clearRect(0, 0, ctxImage.canvas.width, ctxImage.canvas.height);
     ctxImage.drawImage(img, 0, 0, w, h);
     ctx.drawImage(ctxImage.canvas, 0, 0, w, h, 0, 0, canvas.width, canvas.height);
-    data = ctxImage.getImageData(0, 0, w, h);
+    var data = ctxImage.getImageData(0, 0, w, h);
+    console.log(data)
     while ( (i += 1) <  data.data.length ) {
-        ++count;
-        console.log(data.data[3])
+        console.log(data.data[i+3])
     }
 };
 //var rgb = getAverageRGB(document.getElementById('i'));
