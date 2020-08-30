@@ -678,6 +678,10 @@ if (json){layer=img.getLayer()};
   hitbox.on('mouseover',function(){document.body.style.cursor='move';});
   hitbox.on('mouseout',function(){document.body.style.cursor='default';});
   hitbox.on('dragmove', (e) => {
+    img.position({x: hitbox.x(),y: hitbox.y()});
+    circle.position({x: hitbox.x()+img.width()/2,y: hitbox.y()+img.height()/2,});
+  })
+  hitbox.on('dragend', (e) => {
   hitbox.position({
   x: Math.round(hitbox.x() / blockSize) * blockSize,
   y: Math.round(hitbox.y() / blockSize) * blockSize});
