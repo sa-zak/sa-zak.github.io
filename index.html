@@ -318,8 +318,8 @@ $("#download").click(function () {
     stage.find('Image').forEach(img=>{
       rightest=Math.max(rightest,img.x()+stage.find('Image')[0].width());
       leftest=Math.min(leftest,img.x());
-      uppest=Math.min(rightest,img.x()+stage.find('Image')[0].height());
-      lowest=Math.max(leftest,img.x());
+      uppest=Math.min(rightest,img.y()+stage.find('Image')[0].height());
+      lowest=Math.max(leftest,img.y());
     })
     stage.scale({x:1,y:1});
     stage.x(leftest);
