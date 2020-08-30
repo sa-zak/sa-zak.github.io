@@ -83,7 +83,7 @@ img{
 <div id="header" style="background-color:#2F3136;">
 <table style="width: 100%; height: 90%;" >
 <tr>
-<td onclick="window.location='https://github.com/sa-zak/sa-zak.github.io'">Space Arena Zak Designer</td>
+<td onclick="window.location='http://sa-zak.github.io/event'">Space Arena Zak Designer</td>
 <td id="mirror">MIRROR MODE</td>
 <td onclick="downloadString()">DOWNLOAD PROJECT</td>
 <td id="download" href="#" style="color:white">DOWNLOAD IMAGE</td>
@@ -267,8 +267,8 @@ $( document ).ready( function() {
     stage.find('Image').forEach(img=>{
       rightest=Math.max(rightest,img.x()+50);
       leftest=Math.min(leftest,img.x());
-      uppest=Math.min(rightest,img.x()+50);
-      lowest=Math.max(leftest,img.x());
+      uppest=Math.min(rightest,img.y()+50);
+      lowest=Math.max(leftest,img.y());
     })
     if (mirror){mirror.opacity(0)}
     stage.scale({x:1,y:1});
@@ -312,6 +312,9 @@ function movestage(){
   });
 }
 function save(){
+  if (true){
+    return;
+  }
   ver+=1;
   history.splice(ver-1,history.length-ver,stage.toJSON()+"#0#0#0");
 }
@@ -600,7 +603,7 @@ layer.on('dragend', function (e) {
     save();  
 })})
 stage.on('mousemove', (e) => {
-if (event.which==1 && recentmodule && ctrl){
+if (ctrl && event.which==1 && recentmodule){
   var intercept=stage.getIntersection({x:Math.round(relPos().x/unit)*unit,y:Math.round(relPos().y/unit)*unit})
   if(!intercept||intercept.attrs.source!=recentmodule.src||intercept.x()==mirrorx-25){
     if(intercept||(intercept&&intercept.x()!=mirrorx-25)){ intercept.destroy()}
