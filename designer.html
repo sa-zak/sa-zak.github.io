@@ -312,9 +312,6 @@ function movestage(){
   });
 }
 function save(){
-  if (true){
-    return;
-  }
   ver+=1;
   history.splice(ver-1,history.length-ver,stage.toJSON()+"#0#0#0");
 }
@@ -340,14 +337,14 @@ function mirrorm(img){
   })
   img.on('dragend', (e) => {
     if(!mirror===true){return}
-    clone.x(Math.round((-img.x()+mirrorx*2-50)/unit)*unit)
-    clone.y(Math.round(img.y()/unit)*unit)
+    clone.x(Math.floor((-img.x()+mirrorx*2-50)/unit)*unit)
+    clone.y(Math.floor(img.y()/unit)*unit)
     save()
   })
   clone.on('dragend', (e) => {
     if(!mirror===true){return}
-    img.x(Math.round((-clone.x()+mirrorx*2-50)/unit)*unit)
-    img.y(Math.round(clone.y()/unit)*unit)
+    img.x(Math.floor((-clone.x()+mirrorx*2-50)/unit)*unit)
+    img.y(Math.floor(clone.y()/unit)*unit)
     save()
   })
   img.on('dblclick', (e)=> {
@@ -434,7 +431,6 @@ tr.nodes().forEach(function(img){
       y:img.y(),
       width: 50,
       height: 50,
-      draggable:true
     });
     var imageObj = new Image();
     imageObj.src = img.attrs.source;
@@ -597,23 +593,22 @@ layer.on('dragend', function (e) {
   var target = e.target;
   layer.children.each(function (group) {
     target.position({
-      x: Math.round(target.x()/unit)*unit,
-      y: Math.round(target.y()/unit)*unit});
+      x: Math.floor(target.x()/unit)*unit,
+      y: Math.floor(target.y()/unit)*unit});
     layer.batchDraw();
     save();  
 })})
 stage.on('mousemove', (e) => {
 if (ctrl && event.which==1 && recentmodule){
-  var intercept=stage.getIntersection({x:Math.round(relPos().x/unit)*unit,y:Math.round(relPos().y/unit)*unit})
+  var intercept=stage.getIntersection({x:Math.floor(relPos().x/unit)*unit,y:Math.floor(relPos().y/unit)*unit})
   if(!intercept||intercept.attrs.source!=recentmodule.src||intercept.x()==mirrorx-25){
     if(intercept||(intercept&&intercept.x()!=mirrorx-25)){ intercept.destroy()}
   var img = new Konva.Image({
     image: recentmodule,
     source: recentmodule.src,
-    draggable: true,
     upg:recentmodule.upg,
-    x: Math.round(relPos().x/unit)*unit,
-    y: Math.round(relPos().y/unit)*unit,
+    x: Math.floor(relPos().x/unit)*unit,
+    y: Math.floor(relPos().y/unit)*unit,
   });
   layer.add(img);
   stage.add(layer);
@@ -625,10 +620,9 @@ if (e.type=='tap'||event.which==1){
 var img = new Konva.Image({
   image: recentmodule,
   source: recentmodule.src,
-  draggable: true,
   upg:recentmodule.upg,
-  x: Math.round(relPos().x / unit) * unit,
-  y: Math.round(relPos().y / unit) * unit,
+  x: Math.floor(relPos().x / unit) * unit,
+  y: Math.floor(relPos().y / unit) * unit,
 });
 layer.add(img);
 stage.add(layer);
@@ -669,7 +663,6 @@ function json(ev) {
       var image = new Konva.Image({
       image: temp,
       source: $("#inventory img")[0].src,
-      draggable: true,
       });
     for (var i = 0; i < w * h; i++) {
       if (data[i*4+3]!=0){
